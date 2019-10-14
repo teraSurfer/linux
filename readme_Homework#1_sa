@@ -15,3 +15,14 @@ Sep 29   task completed
              Therefore, I have migrate partition to GUID, change the BIOS to UEFI
              and now Install a Ubuntu. Finally in same latop I have windows 10 
              and Ubuntu 18.04.
+
+Oct 04  
+    1- Installation of KVM
+
+Oct 06
+    1- Install git
+    2- Clone repository
+    3- install pakages required to compile
+    4- compile the kernel
+    5- install  virt-manager 
+
