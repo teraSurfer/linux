@@ -7380,6 +7380,10 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
 	}
 
 	switch (nr) {
+        /* CMPE283 : Virtualization Assignment 1: Communicating with the hypervisor */
+        case KVM_FEATURE_CMPE283:
+       		ret = 0x0033383245504D43;
+		break;
 	case KVM_HC_VAPIC_POLL_IRQ:
 		ret = 0;
 		break;

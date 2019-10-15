@@ -14,6 +14,9 @@
 #define KVM_SVM_DEFAULT_PLE_WINDOW_MAX	USHRT_MAX
 #define KVM_SVM_DEFAULT_PLE_WINDOW	3000
 
+/*  CMPE283 : Virtualization Assignment 1: Communicating with the hypervisor */
+#define KVM_FEATURE_CMPE283      0x283
+
 static inline unsigned int __grow_ple_window(unsigned int val,
 		unsigned int base, unsigned int modifier, unsigned int max)
 {
