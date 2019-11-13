@@ -1039,6 +1039,9 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 
 
 /***>> Assignment 2: Instrumentation via hypercall ***/
+u32 counterExits = 0;
+EXPORT_SYMBOL(counterExits);
+
 bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	       u32 *ecx, u32 *edx)
 {
