@@ -1037,16 +1037,52 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 }
 EXPORT_SYMBOL_GPL(kvm_cpuid);
 
+
+/***>> Assignment 2: Instrumentation via hypercall ***/
+bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+	       u32 *ecx, u32 *edx)
+{
+	switch (*eax) {
+		case  TOTAL_NUMBER_OF_ALL_EXITS:
+			*eax = counterExits;
+			*ebx = 0x12345678;
+			break;
+		case  TOTAL_TIME_SPENT_ALL_EXITS:
+			*ebx = 0x9abcdef;
+			break;
+		case  TOTAL_NUMBER_OF_ONE_EXIT:
+			*ecx = 0x56781234;
+			break;	
+		case  TOTAL_TIME_SPENT_ONE_EXIT:
+			*edx = 0x11115678; 
+			break;
+		default:
+            *eax = *ebx = *ecx = *edx = 0;
+			break; 
+	}
+
+	return true;
+}
+EXPORT_SYMBOL_GPL(modify_cpuid);
+/***<< Assignment 2: Instrumentation via hypercall ***/
+
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
-	u32 eax, ebx, ecx, edx;
+	u32 eax, ebx, ecx, edx, modCpuId;
 
 	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
 		return 1;
 
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
-	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+
+	modCpuId = eax & ASSIGNMENT_2_LEAF;
+	if (modCpuId == ASSIGNMENT_2_LEAF ){
+		modify_cpuid(vcpu, &eax, &ebx, &ecx, &edx);
+	} else {
+		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+	}
+
 	kvm_rax_write(vcpu, eax);
 	kvm_rbx_write(vcpu, ebx);
 	kvm_rcx_write(vcpu, ecx);

@@ -2,9 +2,23 @@
 #ifndef ARCH_X86_KVM_CPUID_H
 #define ARCH_X86_KVM_CPUID_H
 
+/***>> Assignment 2: Instrumentation via hypercall ***/
+#define ASSIGNMENT_2_LEAF		    0x4FFFFFFC
+#define TOTAL_NUMBER_OF_ALL_EXITS   0x4FFFFFFF
+#define TOTAL_TIME_SPENT_ALL_EXITS  0x4FFFFFFE
+#define TOTAL_NUMBER_OF_ONE_EXIT    0x4FFFFFFD
+#define TOTAL_TIME_SPENT_ONE_EXIT  	0x4FFFFFFC
+/***<< Assignment 2: Instrumentation via hypercall ***/
+
 #include "x86.h"
 #include <asm/cpu.h>
 #include <asm/processor.h>
+
+/***>> Assignment 2: Instrumentation via hypercall ***/
+extern u32 counterExits;
+bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+	       u32 *ecx, u32 *edx);
+/***<< Assignment 2: Instrumentation via hypercall ***/
 
 int kvm_update_cpuid(struct kvm_vcpu *vcpu);
 bool kvm_mpx_supported(void);

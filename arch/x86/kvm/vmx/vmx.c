@@ -5853,7 +5853,6 @@ void dump_vmcs(void)
 		pr_err("Virtual processor ID = 0x%04x\n",
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
-
 /*
  * The guest has exited.  See if we can fix it or if we need userspace
  * assistance.
@@ -5863,6 +5862,7 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	u32 exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
+	++counterExits;
 
 	trace_kvm_exit(exit_reason, vcpu, KVM_ISA_VMX);
 
@@ -7002,6 +7002,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
 
 #undef cr4_fixed1_update
 }
+u32 counterExits = 0;
 
 static void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
 {
