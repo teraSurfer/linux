@@ -5865,8 +5865,9 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 	u32 vectoring_info = vmx->idt_vectoring_info;
 	
 	/***>> Assignment 2: Instrumentation via hypercall ***/
+	u64  end_time = 0; 
+	u64  inital_time = rdtsc();
 	atomic_inc(&counterAllExits);
-	// ++counterExitsBy[exit_reason];
 	atomic_inc(&counterExitsBy[exit_reason]);
 	/***<< Assignment 2: Instrumentation via hypercall ***/
 
@@ -5951,8 +5952,16 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 	}
 
 	if (exit_reason < kvm_vmx_max_exit_handlers
-	    && kvm_vmx_exit_handlers[exit_reason])
+	    && kvm_vmx_exit_handlers[exit_reason]) {
+
+	/***>> Assignment 2: Instrumentation via hypercall ***/
+		end_time = rdtsc();
+		atomic_long_add((end_time - inital_time), &timeSpentAllExits);
+		atomic_long_add((end_time - inital_time), &timeSpentExitsBy[exit_reason]);
+	/***<< Assignment 2: Instrumentation via hypercall ***/
+	
 		return kvm_vmx_exit_handlers[exit_reason](vcpu);
+	}
 	else {
 		vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
 				exit_reason);

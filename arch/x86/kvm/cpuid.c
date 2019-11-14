@@ -1041,9 +1041,13 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 /***>> Assignment 2: Instrumentation via hypercall ***/
 atomic_t counterAllExits = ATOMIC_INIT(0);
 EXPORT_SYMBOL(counterAllExits);
-// u32 counterExitsBy[]= {0};
 atomic_t counterExitsBy[] = ATOMIC_INIT(0);
 EXPORT_SYMBOL(counterExitsBy);
+atomic_long_t timeSpentAllExits = ATOMIC_LONG_INIT(0);
+EXPORT_SYMBOL(timeSpentAllExits);
+atomic_long_t timeSpentExitsBy[] = ATOMIC_LONG_INIT(0);
+EXPORT_SYMBOL(timeSpentExitsBy);
+
 
 bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	       u32 *ecx, u32 *edx)
@@ -1053,14 +1057,15 @@ bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 			*eax = atomic_read(&counterAllExits);
 			break;
 		case  TOTAL_TIME_SPENT_ALL_EXITS:
-			*ebx = 0x9abcdef;
-			break;
+			*ebx = atomic_long_read(&timeSpentAllExits) >> 32;    //high 32 bits o
+			*ecx = atomic_long_read(&timeSpentAllExits);  		  //low 32 bits o
+ 			break;
 		case  TOTAL_NUMBER_OF_ONE_EXIT:
-			// *eax = counterExitsBy[(int)*ecx];
 			*eax = atomic_read(&counterExitsBy[(int)*ecx]);
 			break;	
 		case  TOTAL_TIME_SPENT_ONE_EXIT:
-			*edx = 0x11115678; 
+			*ebx = atomic_long_read(&timeSpentExitsBy[(int)*ecx]) >> 32;
+			*ecx = atomic_long_read(&timeSpentExitsBy[(int)*ecx]);
 			break;
 		default:
             *eax = *ebx = *ecx = *edx = 0;
