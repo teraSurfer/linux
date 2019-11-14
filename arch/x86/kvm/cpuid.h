@@ -13,9 +13,12 @@
 #include "x86.h"
 #include <asm/cpu.h>
 #include <asm/processor.h>
+#include <linux/atomic.h>
 
 /***>> Assignment 2: Instrumentation via hypercall ***/
-extern u32 counterExits;
+// extern u32 counterExitsBy[100];
+extern atomic_t counterAllExits; 
+extern atomic_t counterExitsBy[100];
 bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	       u32 *ecx, u32 *edx);
 /***<< Assignment 2: Instrumentation via hypercall ***/

@@ -1039,22 +1039,25 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 
 
 /***>> Assignment 2: Instrumentation via hypercall ***/
-u32 counterExits = 0;
-EXPORT_SYMBOL(counterExits);
+atomic_t counterAllExits = ATOMIC_INIT(0);
+EXPORT_SYMBOL(counterAllExits);
+// u32 counterExitsBy[]= {0};
+atomic_t counterExitsBy[] = ATOMIC_INIT(0);
+EXPORT_SYMBOL(counterExitsBy);
 
 bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	       u32 *ecx, u32 *edx)
 {
 	switch (*eax) {
 		case  TOTAL_NUMBER_OF_ALL_EXITS:
-			*eax = counterExits;
-			*ebx = 0x12345678;
+			*eax = atomic_read(&counterAllExits);
 			break;
 		case  TOTAL_TIME_SPENT_ALL_EXITS:
 			*ebx = 0x9abcdef;
 			break;
 		case  TOTAL_NUMBER_OF_ONE_EXIT:
-			*ecx = 0x56781234;
+			// *eax = counterExitsBy[(int)*ecx];
+			*eax = atomic_read(&counterExitsBy[(int)*ecx]);
 			break;	
 		case  TOTAL_TIME_SPENT_ONE_EXIT:
 			*edx = 0x11115678; 
