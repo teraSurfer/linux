@@ -1041,32 +1041,47 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 /***>> Assignment 2: Instrumentation via hypercall ***/
 atomic_t counterAllExits = ATOMIC_INIT(0);
 EXPORT_SYMBOL(counterAllExits);
-// u32 counterExitsBy[]= {0};
 atomic_t counterExitsBy[] = ATOMIC_INIT(0);
 EXPORT_SYMBOL(counterExitsBy);
+atomic_long_t timeSpentAllExits = ATOMIC_LONG_INIT(0);
+EXPORT_SYMBOL(timeSpentAllExits);
+atomic_long_t timeSpentExitsBy[] = ATOMIC_LONG_INIT(0);
+EXPORT_SYMBOL(timeSpentExitsBy);
+
 
 bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	       u32 *ecx, u32 *edx)
 {
-	switch (*eax) {
-		case  TOTAL_NUMBER_OF_ALL_EXITS:
-			*eax = atomic_read(&counterAllExits);
-			break;
-		case  TOTAL_TIME_SPENT_ALL_EXITS:
-			*ebx = 0x9abcdef;
-			break;
-		case  TOTAL_NUMBER_OF_ONE_EXIT:
-			// *eax = counterExitsBy[(int)*ecx];
-			*eax = atomic_read(&counterExitsBy[(int)*ecx]);
-			break;	
-		case  TOTAL_TIME_SPENT_ONE_EXIT:
-			*edx = 0x11115678; 
-			break;
-		default:
-            *eax = *ebx = *ecx = *edx = 0;
-			break; 
-	}
+    int validExits[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,0xFF,36,37,0xFF,39,40,41,0xFF,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,0xFF,66,67,68};
 
+	if (*ecx <= 68 && validExits[*ecx] == *ecx) {
+		switch (*eax) {
+			case  TOTAL_NUMBER_OF_ALL_EXITS:
+				*eax = atomic_read(&counterAllExits);
+				*ebx = *ecx = *edx = 0;
+				break;
+			case  TOTAL_TIME_SPENT_ALL_EXITS:
+				*ebx = atomic_long_read(&timeSpentAllExits) >> 32;    //high 32 bits o
+				*ecx = atomic_long_read(&timeSpentAllExits);  		  //low 32 bits o
+				*eax = *edx = 0;
+				break;
+			case  TOTAL_NUMBER_OF_ONE_EXIT:
+				*eax = atomic_read(&counterExitsBy[(int)*ecx]);
+				*ebx = *ecx = *edx = 0;
+				break;	
+			case  TOTAL_TIME_SPENT_ONE_EXIT:
+				*ebx = atomic_long_read(&timeSpentExitsBy[(int)*ecx]) >> 32;
+				*ecx = atomic_long_read(&timeSpentExitsBy[(int)*ecx]);
+				*eax = *edx = 0;
+				break;
+			default:
+				*eax = *ebx = *ecx = *edx = 0;
+				break; 
+		}
+	} else{
+		*eax = *ebx = *ecx = 0;
+		*edx = 0xFFFFFFFF;
+	}
 	return true;
 }
 EXPORT_SYMBOL_GPL(modify_cpuid);
