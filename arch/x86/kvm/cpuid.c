@@ -1059,6 +1059,7 @@ bool modify_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 			case  TOTAL_NUMBER_OF_ALL_EXITS:
 				*eax = atomic_read(&counterAllExits);
 				*ebx = *ecx = *edx = 0;
+				printk("Total number of Exits is : %u", atomic_read(&counterAllExits));
 				break;
 			case  TOTAL_TIME_SPENT_ALL_EXITS:
 				*ebx = atomic_long_read(&timeSpentAllExits) >> 32;    //high 32 bits o
